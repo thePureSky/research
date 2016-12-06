@@ -3,6 +3,7 @@
 
 from scipy import optimize
 import math
+import json
 
 
 uploaders = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
@@ -35,6 +36,9 @@ c = [0.06/12 for i in range(n_uploader)]
 
 # store the value of L
 pre_L =  -100000000
+
+# the value of L
+L_h = []
 
 def key_func(x, n):
 #	n = 0
@@ -72,6 +76,7 @@ def solve_r3():
 		update_multipliers()
 		print_up_bitrates()
 		L_value = calculate_L()
+		L_h.append(L_value)
 		print "The value of L:", L_value
 		if abs(L_value - pre_L) < 1.0:
 			print "stop!!!!!!!!!!!!!!!"
@@ -103,8 +108,10 @@ def print_up_bitrates():
 		print i, up_bitrates[i]
 
 #solve_r1()
-solve_r2()
-#solve_r3()
+#solve_r2()
+solve_r3()
 
+with open("L.csv", 'w') as f:
+	f.write(json.dumps(L_h) + "\n")
 
 #print_up_bitrates()

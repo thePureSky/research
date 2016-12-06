@@ -294,13 +294,13 @@ def cal_avg_time_coding():
 	print "Considering the scenario in static network with coding, the average time is:", s_avg_time
 
 	# dynamic network
-	times = 1000
+	times = 10000
 	history = []
 	for i in range(times):
 		dynamic_init_rate()
 		d_avg_time = simulation_with_coding()
-		if i % 100 == 1:
-			print i, d_avg_time, float(sum(history)) / len(history)
+		#if i % 100 == 1:
+		#	print i, d_avg_time, float(sum(history)) / len(history)
 		history.append(d_avg_time)
 	print "Considering the scenario in dynamic network with coding, the average time (the worst case) is:", float(sum(history)) / times
 
