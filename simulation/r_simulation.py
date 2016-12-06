@@ -9,6 +9,7 @@
 
 import json
 import os, sys
+import random
 
 # Initialization of configurations
 # Number of servers
@@ -42,6 +43,9 @@ packet_size = 0.1
 # float operation error
 float_error = 0.00001
 
+# global offset
+off_set = 1
+
 # Initialization of the uploading rate of the servers with 0
 r = [0 for i in range(m)]
 
@@ -50,7 +54,16 @@ def init_uploading_rate():
 	    r[i] = 1.0
 	for i in range(500, 1000):
 	    r[i] = 0.1
-	
+
+def dynamic_init_rate():
+	for i in range(m):
+		random_number = random.random()
+		if random_number > 0.5:
+			r[i] = 1.0
+		else:
+			r[i] = 0.1
+	r.sort()
+	r.reverse()
 
 def check(record):
 	for i in record:
@@ -65,22 +78,25 @@ def re_assign_for_one_server(assign_number, record, n):
 		if record[index] == False:
 			assign_number[n] = index
 			return True
-	print "All of the users is ok!"
+	#print "All of the users is ok!"
 	return False
 
 def	re_assign_for_all_servers(assign_number, record):
 	if check(record) == False:
 		return
-	cur_number = 0
 	len_record = len(record)
+
+	global off_set
+	cur_number = off_set % len_record
+	off_set += 1
 	for i in range(len(assign_number)):
 		if record[cur_number] != True:
-			assign_number = cur_number
+			assign_number[i] = cur_number
 		else:
 			while(True):
 				cur_number = (cur_number + 1) % len_record
 				if record[cur_number] != True:
-					assign_number = cur_number
+					assign_number[i] = cur_number
 					break
 		cur_number = (cur_number + 1) % len_record
 
@@ -97,7 +113,7 @@ def simulation_with_coding():
 
 	# the amount of servers included
 	all_servers_number = m
-	print "For each file in coding scenario, the overall number of servers:", all_servers_number
+	#print "For each file in coding scenario, the overall number of servers:", all_servers_number
 	
 	# the uploading rate the these worst servers
 	r_server = [r[i] for i in range(all_servers_number)]
@@ -191,7 +207,7 @@ def simulation_without_coding():
 
 	# the amount of servers included
 	worst_servers_number = m / w
-	print "For each segment, the number of servers in worst case:", worst_servers_number
+	#print "For each segment, the number of servers in worst case:", worst_servers_number
 	
 	# the uploading rate the these worst servers
 	r_server = [r[m - worst_servers_number + i] for i in range(worst_servers_number)]
@@ -277,11 +293,33 @@ def cal_avg_time_coding():
 	s_avg_time = simulation_with_coding()
 	print "Considering the scenario in static network with coding, the average time is:", s_avg_time
 
+	# dynamic network
+	times = 1000
+	history = []
+	for i in range(times):
+		dynamic_init_rate()
+		d_avg_time = simulation_with_coding()
+		if i % 100 == 1:
+			print i, d_avg_time, float(sum(history)) / len(history)
+		history.append(d_avg_time)
+	print "Considering the scenario in dynamic network with coding, the average time (the worst case) is:", float(sum(history)) / times
+
 def cal_avg_time_without_coding():
 	# static network, one file
 	init_uploading_rate()
 	s_n_avg_time = simulation_without_coding()
 	print "Considering the scenario in static network without coding, the average time (the worst case) is:", s_n_avg_time
+
+	# dynamic network
+	times = 1000
+	history = []
+	for i in range(times):
+		dynamic_init_rate()
+		d_n_avg_time = simulation_without_coding()
+		if i % 100 == 0:
+			print i, d_n_avg_time
+		history.append(d_n_avg_time)
+	print "Considering the scenario in dynamic network without coding, the average time (the worst case) is:", float(sum(history)) / times
 
 def show_10_users(a):
 	print "\nthe size got of 10 users:"
@@ -293,12 +331,8 @@ def show_10_users(a):
 # The main test code
 
 # The scenario without coding
-cal_avg_time_without_coding()
+#cal_avg_time_without_coding()
 
 # The scenario with coding
 cal_avg_time_coding()
-
-
-
-
 

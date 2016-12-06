@@ -65,7 +65,7 @@ def calculate_t_coding():
 	# calculate the average time Tc
 	
 	sum_2 = 0.0
-	for j in range(i_pivot + 1, m + 1):
+	for j in range(i_pivot, m + 1):
 		sum_2 += r[j - 1]
 #	print sum_2
 	
