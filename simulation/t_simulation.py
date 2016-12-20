@@ -13,7 +13,7 @@ F = 1000
 w = 10
 
 # the value of l
-l = 1
+l = 9
 
 # the percent of files
 x = float(l) / w
