@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 # -*- coding:utf-8  -*-
 
-import json
 import os, sys
 import random
 
@@ -22,7 +21,7 @@ w = 10
 f_w = float(F) / w
 
 # the value of l
-l = 2
+l = 1
 
 # the percentage each server store
 x = float(l) / w
@@ -36,10 +35,10 @@ len_samples = len(sample_rates)
 float_error = 0.000001
 
 # the max request number for each user, for coding scenario
-request_number = 100
+request_number = 20
 
 # the number of request for each user each segment, for without-coding scenario
-segment_request_number = 50
+segment_request_number = 100
 
 
 # Initialization of the uploading rate of the servers with 0
@@ -364,13 +363,13 @@ def cal_avg_time_without_coding_dynamic():
 # The main test code
 
 # The scenario without coding, static network
-cal_avg_time_without_coding_static()
+#cal_avg_time_without_coding_static()
 
 # The scenario without coding, dynamic network
 #cal_avg_time_without_coding_dynamic()
 
 # The scenario with coding, static network
-#cal_avg_time_coding_static()
+cal_avg_time_coding_static()
 
 # The scenario with coding, dynamic network
 #cal_avg_time_coding_dynamic()
