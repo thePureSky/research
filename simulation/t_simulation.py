@@ -13,11 +13,11 @@ F = 1000
 w = 10
 
 # the value of l
-l = 9
+l = 1
 
 # the percent of files
 x = float(l) / w
-
+x = 0.7
 #print x
 
 # initialze the uploading rate of servers with 0
@@ -46,7 +46,7 @@ def calculate_t_coding():
 	for i in range(1, m):
 		if i == 1:
 			x_i = calculate_x_i(i)
-#			print x_i
+			print x_i
 			if x_i < x:
 				i_pivot = 0
 				break
@@ -55,6 +55,8 @@ def calculate_t_coding():
 			print "i:", i
 			i_pivot = i
 			break
+		if i == m - 1:
+			i_pivot = m - 1
 	# test the value of i_pivot
 	if i_pivot != -1:
 		print "The value of i_pivot:", i_pivot
@@ -65,9 +67,9 @@ def calculate_t_coding():
 	# calculate the average time Tc
 	
 	sum_2 = 0.0
-	for j in range(i_pivot, m + 1):
+	for j in range(i_pivot + 1, m + 1):
 		sum_2 += r[j - 1]
-#	print sum_2
+	print sum_2
 	
 	Tc = float(n) * F * (1 - i_pivot * x) / sum_2
 	print "Theorectically, the average time with coding is:", Tc
@@ -90,6 +92,6 @@ def calculate_t_no_coding():
 
 
 calculate_t_coding()
-calculate_t_no_coding()
+#calculate_t_no_coding()
 
 
