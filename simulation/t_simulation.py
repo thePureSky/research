@@ -10,15 +10,15 @@ n = 1000
 F = 1000
 
 # segments of the file
-w = 10
+w =  10
 
 # the value of l
 l = 1
 
 # the percent of files
 x = float(l) / w
-x = 0.7
 #print x
+
 
 # initialze the uploading rate of servers with 0
 r = [0 for i in range(m)]
@@ -80,11 +80,11 @@ def calculate_t_no_coding():
 	# calculate the sum of rate
 	sum_3 = 0.0
 #	print m/w
-	start_point = 1000 - m/w + 1
-#	print start_point
+	start_point = 1000 - int(m*l/w) + 1
+	print start_point
 
 	for i in range(start_point, m + 1):
-		sum_3 += r[i - 1]
+		sum_3 += r[i - 1] / l
 #	print sum_3
 	Tn = float(n * F) / (w * sum_3)
 	print "Theorectically, the average time without coding in the worst case is:", Tn
@@ -92,6 +92,6 @@ def calculate_t_no_coding():
 
 
 calculate_t_coding()
-#calculate_t_no_coding()
+calculate_t_no_coding()
 
 

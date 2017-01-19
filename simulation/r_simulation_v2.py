@@ -15,7 +15,7 @@ n = 1000
 F = 1000.0
 
 # the amount of segments
-w = 10
+w = 2
 
 # size of each segment
 f_w = float(F) / w
@@ -35,10 +35,10 @@ len_samples = len(sample_rates)
 float_error = 0.000001
 
 # the max request number for each user, for coding scenario
-request_number = 20
+request_number = 100
 
 # the number of request for each user each segment, for without-coding scenario
-segment_request_number = 100
+segment_request_number = 10
 
 
 # Initialization of the uploading rate of the servers with 0
@@ -68,11 +68,21 @@ def random_allocate_server(u):
 	if len_servers == max_number:
 		allocate_servers = u
 	else:
-		temp = u
+		count = 0
+		list_ran = []
+		len_false = [True for i in range(len_servers)]
+		while (True):
+			random_number = random.randint(0, len_servers - 1)
+			if len_false[random_number] == True:
+				list_ran.append(random_number)
+				count += 1
+				len_false[random_number] = False
+				if count == max_number:
+					break
+
 		for i in range(max_number):
-			random_number = int(random.random() * len(temp))
-			allocate_servers.append(random_number)
-			del temp[random_number]
+			allocate_servers.append(u[list_ran[i]])
+
 		
 	#print allocate_servers
 	return allocate_servers
@@ -161,7 +171,7 @@ def simulation_with_coding():
 		if (user_success_count == n):
 			break
 
-		#print "time slot:", time
+#		print "time slot:", time
 
 	#print users_got_file
 	return time
@@ -169,7 +179,8 @@ def simulation_with_coding():
 def random_allocate_segments():
 	s_temp = []
 	for i in range(m):
-		temp = []
+		temp = set()
+		#temp = []
 		s_temp.append(temp)
 
 	server_count = [0 for i in range(m)]
@@ -177,17 +188,50 @@ def random_allocate_segments():
 	replicate_number = int(m * l / w)
 	#print replicate_number
 
+	surplus_number = m * l - replicate_number * w
+
+	segment_servers_number = [0] * w
+
 	for i in range(w):
-		for j in range(replicate_number):
+		if surplus_number != 0:
+			segment_servers_number[i] = replicate_number + 1
+			surplus_number -= 1
+		else:
+			segment_servers_number[i] = replicate_number
+	
+	#print segment_servers_number
+	#print sum(segment_servers_number)
+
+
+	layer_count = 0
+	flag = 0
+	for i in range(w):
+		for j in range(segment_servers_number[i]):
 			while(True):
-				random_number = int(random.random()*(m))
+				random_number = random.randint(0, m - 1)
 				if i in s_temp[random_number]:
 					continue
-				if ((server_count[random_number] <= i/5) and (len(s_temp[random_number]) < l)) :
-					s_temp[random_number].append(i)
+				if ((server_count[random_number] <= layer_count) and (len(s_temp[random_number]) < l)) :
+					#s_temp[random_number].append(i)
+					s_temp[random_number].add(i)
 					server_count[random_number] += 1
 					break
 				#print i,j
+			if flag + j + 1 == m:
+				layer_count += 1
+		flag += segment_servers_number[i]
+		flag %= m
+
+	print "initialization of the alocation of the segments: Done!"
+
+	for i in range(len(s_temp)):
+		if len(s_temp[i]) != l:
+			print "ERROR! allocate error!"
+			sys.exit(-1)
+
+	for i in range(m):
+		s_temp[i] = list(s_temp[i])
+
 
 	return s_temp 
 
@@ -199,13 +243,22 @@ def random_allocate_server_for_this_segment(max_segment_request, u):
 	if len_servers == max_number:
 		allocate_servers = u
 	else:
-		temp = u
+		count = 0
+		list_ran = []
+		len_false = [True for i in range(len_servers)]
+		while (True):
+			random_number = random.randint(0, len_servers - 1)
+			if len_false[random_number] == True:
+				list_ran.append(random_number)
+				len_false[random_number] = False
+				count += 1
+				if count == max_number:
+					break
+
 		for i in range(max_number):
-			random_number = int(random.random() * len(temp))
-			allocate_servers.append(random_number)
-			del temp[random_number]
+			allocate_servers.append(u[list_ran[i]])
 		
-	#print allocate_servers
+#	print allocate_servers
 	return allocate_servers
 	
 
@@ -310,12 +363,12 @@ def simulation_without_coding():
 							if user_success_segment[k] == w:
 								user_success_count += 1
 								users_leave[k] = True
-								print "User", k, "leaved!"
+								#print "User", k, "leaved!"
 
 		if user_success_count == n:
 			break
 
-		print "Time slot:" , time
+#		print "Time slot:" , time
 
 	return time
 
@@ -337,8 +390,9 @@ def cal_avg_time_coding_dynamic():
 		#	print i, d_avg_time, float(sum(history)) / len(history)
 		history.append(d_avg_time)
 		print "times", i, d_avg_time
-	print history
-	print "Considering the scenario in dynamic network with coding, the average time (the worst case) is:", float(sum(history)) / times
+		print "average:", float(sum(history))/len(history)
+	#print history
+	print "Considering the scenario in dynamic network with coding, the average time is:", float(sum(history)) / times
 
 def cal_avg_time_without_coding_static():
 	# static network, one file
@@ -353,9 +407,10 @@ def cal_avg_time_without_coding_dynamic():
 	for i in range(times):
 		dynamic_init_rate()
 		d_n_avg_time = simulation_without_coding()
-		if i % 100 == 0:
-			print i, d_n_avg_time
+
 		history.append(d_n_avg_time)
+		print "times:", i, d_n_avg_time
+		print "average:", float(sum(history))/len(history)
 	print "Considering the scenario in dynamic network without coding, the average time (the random case) is:", float(sum(history)) / times
 
 
@@ -369,7 +424,7 @@ def cal_avg_time_without_coding_dynamic():
 #cal_avg_time_without_coding_dynamic()
 
 # The scenario with coding, static network
-cal_avg_time_coding_static()
+#cal_avg_time_coding_static()
 
 # The scenario with coding, dynamic network
-#cal_avg_time_coding_dynamic()
+cal_avg_time_coding_dynamic()
