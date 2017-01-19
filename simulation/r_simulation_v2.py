@@ -6,22 +6,22 @@ import random
 
 # Initialization of configurations
 # Number of servers
-m = 1000
+m = 10
 
 # Number of users
-n = 1000
+n = 10
 
 # Total size of the file
 F = 1000.0
 
 # the amount of segments
-w = 2
+w = 80
 
 # size of each segment
 f_w = float(F) / w
 
 # the value of l
-l = 1
+l = 8
 
 # the percentage each server store
 x = float(l) / w
@@ -35,7 +35,7 @@ len_samples = len(sample_rates)
 float_error = 0.000001
 
 # the max request number for each user, for coding scenario
-request_number = 100
+request_number = 10
 
 # the number of request for each user each segment, for without-coding scenario
 segment_request_number = 10
@@ -49,6 +49,14 @@ def init_uploading_rate():
 	    r[i] = 1.0 
 	for i in range(500, 1000):
 	    r[i] = 0.1
+
+def init_uploading_rate_2():
+	for i in range(10):
+		r[i] = 0.1 * (i+1)
+	#print r[0], r[1], r[99], r[100], r[101],r[199],r[200],r[201], r[999]
+	r.sort()
+	r.reverse()
+	print r
 
 def dynamic_init_rate():
 	for i in range(m):
@@ -158,22 +166,23 @@ def simulation_with_coding():
 					user_detail[j][i] = max_size
 					user_server_request[j].remove(i)
 					servers_served_count[i] += 1
-					#if servers_served_count[i] == n:
-					#	print "Server", i, "leaved!"
+					if servers_served_count[i] == n:
+						print "Server", i, "leaved!"
 
-				if users_got_file[j] >= F:
+				if (users_got_file[j]-F) > float_error or abs(users_got_file[j] - F) < float_error:
 					user_success_count += 1
 					users_leave[j] = True
-					#print "User", j, "leaved!"
-					#print "Success_count:", user_success_count
+					print "User", j, "leaved!"
+					print "Success_count:", user_success_count
 					
 		
 		if (user_success_count == n):
 			break
 
-#		print "time slot:", time
+	#	print "time slot:", time
 
-	#print users_got_file
+	#	print users_got_file
+	#	print user_detail
 	return time
 
 def random_allocate_segments():
@@ -375,7 +384,8 @@ def simulation_without_coding():
 
 def cal_avg_time_coding_static():
 	# static network, one file
-	init_uploading_rate()
+	#init_uploading_rate()
+	init_uploading_rate_2()
 	s_avg_time = simulation_with_coding()
 	print "Considering the scenario in static network with coding, the average time is:", s_avg_time
 
@@ -396,7 +406,8 @@ def cal_avg_time_coding_dynamic():
 
 def cal_avg_time_without_coding_static():
 	# static network, one file
-	init_uploading_rate()
+	#init_uploading_rate()
+	init_uploading_rate_2()
 	s_n_avg_time = simulation_without_coding()
 	print "Considering the scenario in static network without coding, the average time (the random case) is:", s_n_avg_time
 
@@ -405,7 +416,8 @@ def cal_avg_time_without_coding_dynamic():
 	times = 100
 	history = []
 	for i in range(times):
-		dynamic_init_rate()
+		#dynamic_init_rate()
+		init_uploading_rate_2()
 		d_n_avg_time = simulation_without_coding()
 
 		history.append(d_n_avg_time)
@@ -414,17 +426,18 @@ def cal_avg_time_without_coding_dynamic():
 	print "Considering the scenario in dynamic network without coding, the average time (the random case) is:", float(sum(history)) / times
 
 
-
 # The main test code
+if __name__ == "__main__":
+	# The scenario without coding, static network
+	#cal_avg_time_without_coding_static()
 
-# The scenario without coding, static network
-#cal_avg_time_without_coding_static()
+	# The scenario without coding, dynamic network
+	cal_avg_time_without_coding_dynamic()
 
-# The scenario without coding, dynamic network
-#cal_avg_time_without_coding_dynamic()
+	# The scenario with coding, static network
+	#cal_avg_time_coding_static()
 
-# The scenario with coding, static network
-#cal_avg_time_coding_static()
-
-# The scenario with coding, dynamic network
-cal_avg_time_coding_dynamic()
+	# The scenario with coding, dynamic network
+	#cal_avg_time_coding_dynamic()
+	
+	#init_uploading_rate_2()
