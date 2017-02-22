@@ -19,7 +19,7 @@ n = 1000
 F = 1000
 
 # segments of the file
-w =  10
+w =  2
 
 # the value of l
 l = 1
@@ -121,12 +121,13 @@ def cal_dynamic_coding():
 
 def cal_dynamic_no_coding():
 	def f(x):
-		G = norm.cdf((x - 55) / 4.5)
-		g = norm.pdf((x - 55) / 4.5)
-		return (pow(10, 6) / x) * g * pow(1 - G, 9)
+		G = norm.cdf((w*x - 550) / (4.5*sqrt(10*w)))
+		g = (sqrt(w)/(4.5*sqrt(10)))*norm.pdf((w*x - 550) / (4.5*sqrt(10*w)))
+		return (pow(10, 6) / x) * g * pow(1 - G, w-1)
 	temp_sum = integrate.quad(f, 0, 1000)
 
 	print "Theroectically, the value of no-coding in dynamic network is:", temp_sum
+
 
 init_uploading_rate()
 #init_uploading_rate_2()

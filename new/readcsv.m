@@ -6,12 +6,12 @@ fclose(fid);
 %celldisp(C);
 %C{5}
 viewer = cell2mat(C(5));
-%viewer = viewer(1:4000);
+viewer = viewer(1:2000);
 % n: the numbers of uploaders
 [n, temp]= size(viewer);
 
 % the whole bandwidth, namely, the bitrate
-b = 13000;
+b = 4000;
 
 
 % the minimal bitrate of each uploader
